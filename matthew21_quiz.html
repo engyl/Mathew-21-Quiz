@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Matthew 21 Quiz</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #C9A84C;
+    --deep: #1A1A2E;
+    --navy: #16213E;
+    --slate: #0F3460;
+    --cream: #F5EDD6;
+    --light: #FBF7EE;
+    --text: #2C2C3E;
+    --muted: #888;
+    --correct: #2E7D32;
+    --error: #C62828;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Source Sans 3', sans-serif;
+    background: var(--deep);
+    min-height: 100vh;
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  /* Decorative background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 20% 20%, rgba(201,168,76,0.08) 0%, transparent 60%),
+      radial-gradient(ellipse at 80% 80%, rgba(15,52,96,0.4) 0%, transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .page {
+    display: none;
+    min-height: 100vh;
+    position: relative;
+    z-index: 1;
+  }
+  .page.active { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; }
+
+  /* ===== COVER PAGE ===== */
+  #cover {
+    text-align: center;
+  }
+
+  .cross-icon {
+    font-size: 3rem;
+    color: var(--gold);
+    margin-bottom: 1.5rem;
+    animation: glow 3s ease-in-out infinite;
+  }
+  @keyframes glow {
+    0%,100% { text-shadow: 0 0 10px rgba(201,168,76,0.3); }
+    50% { text-shadow: 0 0 30px rgba(201,168,76,0.8), 0 0 60px rgba(201,168,76,0.3); }
+  }
+
+  .cover-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    padding: 3rem 3.5rem;
+    max-width: 520px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4), inset 0 1px 0 rgba(201,168,76,0.2);
+  }
+
+  .cover-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2.6rem;
+    font-weight: 900;
+    color: var(--cream);
+    line-height: 1.1;
+    margin-bottom: 0.4rem;
+  }
+  .cover-subtitle {
+    font-size: 0.9rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 2.5rem;
+  }
+
+  .divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    margin: 2rem 0;
+  }
+
+  label {
+    display: block;
+    font-size: 0.78rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 0.5rem;
+    text-align: left;
+  }
+
+  input[type="text"], input[type="password"] {
+    width: 100%;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 8px;
+    padding: 0.85rem 1rem;
+    color: var(--cream);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 1rem;
+    margin-bottom: 1.2rem;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    outline: none;
+  }
+  input[type="text"]:focus, input[type="password"]:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 0 3px rgba(201,168,76,0.15);
+  }
+  input::placeholder { color: rgba(255,255,255,0.25); }
+
+  .btn {
+    display: inline-block;
+    background: linear-gradient(135deg, #C9A84C, #A0782A);
+    color: var(--deep);
+    font-family: 'Source Sans 3', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 0.9rem 2.5rem;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    width: 100%;
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
+    box-shadow: 0 4px 20px rgba(201,168,76,0.3);
+    margin-top: 0.5rem;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(201,168,76,0.45); }
+  .btn:active { transform: translateY(0); }
+
+  .btn-ghost {
+    background: transparent;
+    border: 1px solid rgba(201,168,76,0.4);
+    color: var(--gold);
+    box-shadow: none;
+    margin-top: 0.8rem;
+  }
+  .btn-ghost:hover { background: rgba(201,168,76,0.08); box-shadow: none; }
+
+  .error-msg {
+    color: #FF6B6B;
+    font-size: 0.85rem;
+    text-align: center;
+    margin-top: -0.6rem;
+    margin-bottom: 0.8rem;
+    min-height: 1.2rem;
+  }
+
+  /* ===== QUIZ PAGE ===== */
+  #quiz {
+    justify-content: flex-start;
+    padding: 2rem 1rem;
+    align-items: stretch;
+  }
+
+  .quiz-container {
+    max-width: 720px;
+    width: 100%;
+    margin: 0 auto;
+  }
+
+  .quiz-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(201,168,76,0.2);
+  }
+
+  .quiz-header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.4rem;
+    color: var(--cream);
+  }
+
+  .participant-badge {
+    background: rgba(201,168,76,0.1);
+    border: 1px solid rgba(201,168,76,0.25);
+    border-radius: 30px;
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+    color: var(--gold);
+    letter-spacing: 0.05em;
+  }
+
+  .progress-bar {
+    background: rgba(255,255,255,0.08);
+    border-radius: 10px;
+    height: 6px;
+    margin-bottom: 2.5rem;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--gold), #F0C060);
+    border-radius: 10px;
+    transition: width 0.4s ease;
+  }
+
+  .question-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 16px;
+    padding: 2.5rem;
+    margin-bottom: 1.5rem;
+    backdrop-filter: blur(6px);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    animation: slideIn 0.3s ease;
+  }
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .question-num {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin-bottom: 1rem;
+  }
+
+  .question-text {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    color: var(--cream);
+    line-height: 1.6;
+    margin-bottom: 1.8rem;
+  }
+
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.7rem;
+  }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: rgba(245,237,214,0.85);
+    font-size: 0.97rem;
+  }
+  .option:hover {
+    background: rgba(201,168,76,0.1);
+    border-color: rgba(201,168,76,0.4);
+    color: var(--cream);
+    transform: translateX(4px);
+  }
+  .option.selected {
+    background: rgba(201,168,76,0.15);
+    border-color: var(--gold);
+    color: var(--cream);
+  }
+  .option input[type="radio"] { display: none; }
+
+  .option-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(201,168,76,0.12);
+    border: 1px solid rgba(201,168,76,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--gold);
+    flex-shrink: 0;
+    transition: background 0.2s;
+  }
+  .option.selected .option-letter {
+    background: var(--gold);
+    color: var(--deep);
+  }
+
+  .nav-row {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+  .nav-row .btn { margin-top: 0; }
+  .btn-secondary {
+    background: rgba(255,255,255,0.08);
+    color: var(--cream);
+    border: 1px solid rgba(255,255,255,0.15);
+    box-shadow: none;
+  }
+  .btn-secondary:hover { background: rgba(255,255,255,0.14); box-shadow: none; }
+
+  .question-dots {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 2rem;
+  }
+  .dot {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .dot.answered { background: rgba(201,168,76,0.2); border-color: var(--gold); color: var(--gold); }
+  .dot.current { background: var(--gold); border-color: var(--gold); color: var(--deep); font-weight: 700; }
+
+  /* ===== CONFIRM SUBMIT MODAL ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(4px);
+  }
+  .modal-overlay.active { display: flex; }
+  .modal {
+    background: linear-gradient(145deg, #1e2a4a, #1a1a2e);
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 16px;
+    padding: 2.5rem;
+    max-width: 440px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.6);
+    animation: popIn 0.25s ease;
+  }
+  @keyframes popIn {
+    from { transform: scale(0.9); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+  }
+  .modal h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.5rem;
+    color: var(--cream);
+    margin-bottom: 1rem;
+  }
+  .modal p { color: rgba(245,237,214,0.7); font-size: 0.95rem; line-height: 1.6; margin-bottom: 1.5rem; }
+  .modal-btns { display: flex; gap: 1rem; }
+  .modal-btns .btn { margin-top: 0; }
+
+  /* ===== THANK YOU PAGE ===== */
+  #thankyou {
+    text-align: center;
+  }
+  .thankyou-card {
+    background: linear-gradient(145deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+    border: 1px solid rgba(201,168,76,0.3);
+    border-radius: 20px;
+    padding: 3.5rem;
+    max-width: 500px;
+    width: 100%;
+    backdrop-filter: blur(10px);
+  }
+  .check-icon { font-size: 3.5rem; margin-bottom: 1rem; animation: bounceIn 0.5s ease; }
+  @keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.2); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .thankyou-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--cream);
+    margin-bottom: 0.8rem;
+  }
+  .thankyou-sub { color: rgba(245,237,214,0.6); font-size: 1rem; margin-bottom: 2rem; line-height: 1.6; }
+
+  /* ===== ADMIN PAGE ===== */
+  #admin {
+    justify-content: flex-start;
+    padding: 2rem 1rem;
+    align-items: stretch;
+  }
+  .admin-container {
+    max-width: 1100px;
+    width: 100%;
+    margin: 0 auto;
+  }
+  .admin-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+  .admin-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.8rem;
+    color: var(--cream);
+  }
+  .admin-badge {
+    background: rgba(201,168,76,0.15);
+    border: 1px solid rgba(201,168,76,0.35);
+    border-radius: 20px;
+    padding: 0.35rem 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+
+  .log-table-wrapper {
+    overflow-x: auto;
+    border-radius: 12px;
+    border: 1px solid rgba(201,168,76,0.2);
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88rem;
+    min-width: 900px;
+  }
+  thead {
+    background: linear-gradient(90deg, rgba(201,168,76,0.18), rgba(201,168,76,0.08));
+  }
+  th {
+    padding: 1rem 0.9rem;
+    text-align: left;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    color: var(--gold);
+    white-space: nowrap;
+    border-bottom: 1px solid rgba(201,168,76,0.25);
+  }
+  td {
+    padding: 0.85rem 0.9rem;
+    color: rgba(245,237,214,0.8);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: rgba(201,168,76,0.05); }
+  .answer-cell {
+    font-size: 0.82rem;
+    color: rgba(245,237,214,0.65);
+    max-width: 120px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .unanswered { color: rgba(255,100,100,0.6); font-style: italic; }
+
+  .empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: rgba(255,255,255,0.3);
+  }
+  .empty-state .icon { font-size: 3rem; margin-bottom: 1rem; }
+
+  .stats-row {
+    display: flex;
+    gap: 1.2rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .stat-card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(201,168,76,0.2);
+    border-radius: 12px;
+    padding: 1.2rem 1.8rem;
+    flex: 1;
+    min-width: 150px;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 2rem;
+    color: var(--gold);
+  }
+  .stat-label {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.4);
+    margin-top: 0.2rem;
+  }
+
+  .timestamp-cell { font-size: 0.78rem; color: rgba(245,237,214,0.4); }
+
+  .clear-btn {
+    background: rgba(198,40,40,0.15);
+    border: 1px solid rgba(198,40,40,0.35);
+    color: #FF8A80;
+    box-shadow: none;
+    font-size: 0.8rem;
+    padding: 0.6rem 1.4rem;
+    width: auto;
+  }
+  .clear-btn:hover { background: rgba(198,40,40,0.25); box-shadow: none; }
+
+  /* ===== ADMIN LOGIN ===== */
+  #adminlogin { text-align: center; }
+</style>
+</head>
+<body>
+
+<!-- ===== COVER PAGE ===== -->
+<div class="page active" id="cover">
+  <div class="cross-icon">✝</div>
+  <div class="cover-card">
+    <div class="cover-title">Matthew 21</div>
+    <div class="cover-subtitle">Bible Knowledge Quiz</div>
+    <div class="divider"></div>
+    <label for="participantName">Your Full Name</label>
+    <input type="text" id="participantName" placeholder="Enter your name" autocomplete="off">
+    <label for="testNumber">Test Number</label>
+    <input type="text" id="testNumber" placeholder="e.g. T-001" autocomplete="off">
+    <div class="error-msg" id="coverError"></div>
+    <button class="btn" onclick="startQuiz()">Begin Quiz →</button>
+    <button class="btn btn-ghost" onclick="showAdminLogin()">Admin Login</button>
+  </div>
+</div>
+
+<!-- ===== QUIZ PAGE ===== -->
+<div class="page" id="quiz">
+  <div class="quiz-container">
+    <div class="quiz-header">
+      <div class="quiz-header-title">✝ Matthew 21 Quiz</div>
+      <div class="participant-badge" id="participantBadge"></div>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="question-dots" id="questionDots"></div>
+    <div class="question-card" id="questionCard">
+      <div class="question-num" id="questionNum"></div>
+      <div class="question-text" id="questionText"></div>
+      <div class="options" id="optionsContainer"></div>
+    </div>
+    <div class="nav-row">
+      <button class="btn btn-secondary" id="prevBtn" onclick="navigate(-1)">← Previous</button>
+      <button class="btn" id="nextBtn" onclick="navigate(1)">Next →</button>
+      <button class="btn" id="submitBtn" style="display:none" onclick="openSubmitModal()">Submit Quiz ✓</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== THANK YOU PAGE ===== -->
+<div class="page" id="thankyou">
+  <div class="check-icon">🎉</div>
+  <div class="thankyou-card">
+    <div class="thankyou-title">Quiz Submitted!</div>
+    <div class="thankyou-sub">Thank you, <strong id="thankyouName" style="color:var(--gold)"></strong>!<br>Your answers have been recorded. God bless you!</div>
+    <div class="divider"></div>
+    <button class="btn" onclick="location.reload()">Take Quiz Again</button>
+  </div>
+</div>
+
+<!-- ===== ADMIN LOGIN ===== -->
+<div class="page" id="adminlogin">
+  <div class="cross-icon">🔐</div>
+  <div class="cover-card">
+    <div class="cover-title">Admin</div>
+    <div class="cover-subtitle">Restricted Access</div>
+    <div class="divider"></div>
+    <label for="adminPass">Admin Password</label>
+    <input type="password" id="adminPass" placeholder="Enter admin password" onkeydown="if(event.key==='Enter')adminLogin()">
+    <div class="error-msg" id="adminError"></div>
+    <button class="btn" onclick="adminLogin()">Access Log →</button>
+    <button class="btn btn-ghost" onclick="showPage('cover')">← Back to Quiz</button>
+  </div>
+</div>
+
+<!-- ===== ADMIN PAGE ===== -->
+<div class="page" id="admin">
+  <div class="admin-container">
+    <div class="admin-header">
+      <div>
+        <div class="admin-title">📋 Participant Log</div>
+        <div style="color:rgba(255,255,255,0.4);font-size:0.85rem;margin-top:0.3rem">Matthew 21 Quiz — Response Records</div>
+      </div>
+      <div style="display:flex;gap:0.8rem;align-items:center;flex-wrap:wrap">
+        <div class="admin-badge">Admin View</div>
+        <button class="btn clear-btn" onclick="clearLog()">Clear All Data</button>
+        <button class="btn btn-ghost" style="width:auto;padding:0.6rem 1.4rem;font-size:0.8rem;margin-top:0" onclick="showPage('cover')">Exit</button>
+      </div>
+    </div>
+    <div class="stats-row" id="statsRow"></div>
+    <div class="log-table-wrapper">
+      <table id="logTable">
+        <thead id="logTableHead"></thead>
+        <tbody id="logTableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SUBMIT CONFIRM MODAL ===== -->
+<div class="modal-overlay" id="submitModal">
+  <div class="modal">
+    <h3>Submit Your Answers?</h3>
+    <p id="modalMsg">Please review your answers. Unanswered questions will be marked as blank.</p>
+    <div class="modal-btns">
+      <button class="btn btn-secondary" style="margin-top:0" onclick="closeSubmitModal()">← Review</button>
+      <button class="btn" style="margin-top:0" onclick="submitQuiz()">Submit ✓</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// QUIZ DATA
+// ============================================================
+const QUESTIONS = [
+  {
+    q: "According to Matt 21:2, Jesus instructed 2 disciples to go into the village. What animal were they instructed to find & bring?",
+    options: ["Donkey", "Donkey & pony", "Donkey & colt", "Donkey & sheep"],
+    answer: "Donkey & colt"
+  },
+  {
+    q: "Jesus entering Jerusalem "on a donkey, on a colt" fulfilled the prophecy stated by (Matt 21:5):",
+    options: ["Psalms", "Zechariah", "Isaiah", "Ezekiel"],
+    answer: "Zechariah"
+  },
+  {
+    q: "Who shouted in the temple area, "Hosanna to the Son of David" (Matt 21:15)?",
+    options: ["The blind and lame", "The crowds", "The children", "Jesus' disciples"],
+    answer: "The children"
+  },
+  {
+    q: "Which 2 groups of people were indignant at what Jesus was doing in the temple (Matt 21:15)?",
+    options: ["Pharisees & sadducees", "Sadducees & chief priests", "Pharisees & scribes", "Chief priests & scribes"],
+    answer: "Chief priests & scribes"
+  },
+  {
+    q: "Where did Jesus go after he cleansed the temple (Matthew 21:17)?",
+    options: ["Jericho", "Bethpage", "Bethany", "Bethelem"],
+    answer: "Bethany"
+  },
+  {
+    q: "How did Jesus tell the disciples they could do what was done to the fig tree (Matt 21:21)?",
+    options: ["If they prayed", "If they fasted & prayed", "If they had pure hearts", "If they had faith"],
+    answer: "If they had faith"
+  },
+  {
+    q: "Who questioned the authority of Jesus (Matt 21:23)?",
+    options: ["Pharisees & sadducees", "Sadducees & chief priests", "Chief priests & elders", "Chief priests & scribes"],
+    answer: "Chief priests & elders"
+  },
+  {
+    q: "When questioned about the source of Jesus's authority, what did Jesus ask the chief priests and the elders (Matt 21:25)?",
+    options: ["About the law of Moses", "About the prophecies of Isaiah", "About the Sabbath", "About John's baptism"],
+    answer: "About John's baptism"
+  },
+  {
+    q: "In the parable of the 2 sons, which son initially refused to go to work in the vineyard but later did (Matt 21:28-29)?",
+    options: ["The older one", "The younger one", "The first son", "The other son"],
+    answer: "The first son"
+  },
+  {
+    q: "According to Jesus, the kingdom of God shall be taken away from Israel and be given to (Matt 21:43):",
+    options: [
+      "A nation that shall not persecute the people of God.",
+      "A nation that regards Jerusalem as the holy city.",
+      "A nation that shall bear the fruit of the kingdom.",
+      "A nation that proves to be religious."
+    ],
+    answer: "A nation that shall bear the fruit of the kingdom."
+  }
+];
+
+const ADMIN_PASSWORD = "admin1234"; // Change as needed
+const STORAGE_KEY = "matthew21_quiz_log";
+
+// ============================================================
+// STATE
+// ============================================================
+let currentQ = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+let participantName = "";
+let testNumber = "";
+
+// ============================================================
+// PAGE NAVIGATION
+// ============================================================
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+// ============================================================
+// START QUIZ
+// ============================================================
+function startQuiz() {
+  participantName = document.getElementById('participantName').value.trim();
+  testNumber = document.getElementById('testNumber').value.trim();
+  const err = document.getElementById('coverError');
+  if (!participantName) { err.textContent = "Please enter your name."; return; }
+  if (!testNumber) { err.textContent = "Please enter your test number."; return; }
+  err.textContent = "";
+  answers = new Array(QUESTIONS.length).fill(null);
+  currentQ = 0;
+  document.getElementById('participantBadge').textContent = `${participantName} · ${testNumber}`;
+  renderQuestion();
+  showPage('quiz');
+}
+
+// ============================================================
+// QUIZ RENDERING
+// ============================================================
+function renderQuestion() {
+  const q = QUESTIONS[currentQ];
+  const total = QUESTIONS.length;
+
+  document.getElementById('progressFill').style.width = `${((currentQ + 1) / total) * 100}%`;
+  document.getElementById('questionNum').textContent = `Question ${currentQ + 1} of ${total}`;
+  document.getElementById('questionText').textContent = q.q;
+
+  const optionsEl = document.getElementById('optionsContainer');
+  optionsEl.innerHTML = '';
+  const letters = ['A', 'B', 'C', 'D'];
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option' + (answers[currentQ] === opt ? ' selected' : '');
+    div.innerHTML = `
+      <div class="option-letter">${letters[i]}</div>
+      <span>${opt}</span>
+    `;
+    div.onclick = () => selectAnswer(opt, div);
+    optionsEl.appendChild(div);
+  });
+
+  // Dots
+  const dotsEl = document.getElementById('questionDots');
+  dotsEl.innerHTML = '';
+  for (let i = 0; i < total; i++) {
+    const dot = document.createElement('div');
+    dot.className = 'dot' + (answers[i] ? ' answered' : '') + (i === currentQ ? ' current' : '');
+    dot.textContent = i + 1;
+    dot.onclick = () => { currentQ = i; renderQuestion(); };
+    dotsEl.appendChild(dot);
+  }
+
+  // Nav buttons
+  document.getElementById('prevBtn').style.display = currentQ === 0 ? 'none' : 'block';
+  const isLast = currentQ === total - 1;
+  document.getElementById('nextBtn').style.display = isLast ? 'none' : 'block';
+  document.getElementById('submitBtn').style.display = isLast ? 'block' : 'none';
+}
+
+function selectAnswer(opt, el) {
+  answers[currentQ] = opt;
+  document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  // Update dot
+  const dots = document.querySelectorAll('.dot');
+  if (dots[currentQ]) dots[currentQ].classList.add('answered');
+}
+
+function navigate(dir) {
+  currentQ = Math.max(0, Math.min(QUESTIONS.length - 1, currentQ + dir));
+  renderQuestion();
+}
+
+// ============================================================
+// SUBMIT
+// ============================================================
+function openSubmitModal() {
+  const unanswered = answers.filter(a => a === null).length;
+  const msg = document.getElementById('modalMsg');
+  msg.textContent = unanswered > 0
+    ? `You have ${unanswered} unanswered question(s). You can still submit, but they will be recorded as blank.`
+    : "All questions answered. Ready to submit?";
+  document.getElementById('submitModal').classList.add('active');
+}
+
+function closeSubmitModal() {
+  document.getElementById('submitModal').classList.remove('active');
+}
+
+function submitQuiz() {
+  closeSubmitModal();
+  saveToLog();
+  document.getElementById('thankyouName').textContent = participantName;
+  showPage('thankyou');
+}
+
+function saveToLog() {
+  let log = getLog();
+  const entry = {
+    name: participantName,
+    testNumber: testNumber,
+    timestamp: new Date().toLocaleString('en-SG', { dateStyle: 'medium', timeStyle: 'short' }),
+    answers: answers.map((a, i) => a || '—')
+  };
+  log.push(entry);
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(log));
+}
+
+function getLog() {
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY)) || [];
+  } catch { return []; }
+}
+
+// ============================================================
+// ADMIN
+// ============================================================
+function showAdminLogin() {
+  document.getElementById('adminError').textContent = '';
+  document.getElementById('adminPass').value = '';
+  showPage('adminlogin');
+}
+
+function adminLogin() {
+  const pass = document.getElementById('adminPass').value;
+  if (pass === ADMIN_PASSWORD) {
+    renderAdminLog();
+    showPage('admin');
+  } else {
+    document.getElementById('adminError').textContent = "Incorrect password. Try again.";
+  }
+}
+
+function renderAdminLog() {
+  const log = getLog();
+
+  // Stats
+  const statsRow = document.getElementById('statsRow');
+  statsRow.innerHTML = `
+    <div class="stat-card"><div class="stat-num">${log.length}</div><div class="stat-label">Participants</div></div>
+    <div class="stat-card"><div class="stat-num">${QUESTIONS.length}</div><div class="stat-label">Questions</div></div>
+    <div class="stat-card"><div class="stat-num">${log.filter(e => e.answers.every(a => a !== '—')).length}</div><div class="stat-label">Fully Completed</div></div>
+  `;
+
+  // Table header
+  const thead = document.getElementById('logTableHead');
+  let headHTML = '<tr><th>#</th><th>Name</th><th>Test No.</th><th>Submitted</th>';
+  for (let i = 1; i <= QUESTIONS.length; i++) headHTML += `<th>Q${i}</th>`;
+  headHTML += '</tr>';
+  thead.innerHTML = headHTML;
+
+  // Table body
+  const tbody = document.getElementById('logTableBody');
+  if (log.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="${QUESTIONS.length + 4}" style="text-align:center;padding:3rem;color:rgba(255,255,255,0.3);font-style:italic">No submissions yet.</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = log.map((entry, idx) => {
+    const answerCells = entry.answers.map(a =>
+      `<td class="answer-cell ${a === '—' ? 'unanswered' : ''}" title="${a}">${a}</td>`
+    ).join('');
+    return `<tr>
+      <td style="color:var(--gold);font-weight:700">${idx + 1}</td>
+      <td style="color:var(--cream);font-weight:600">${entry.name}</td>
+      <td style="color:rgba(245,237,214,0.7)">${entry.testNumber}</td>
+      <td class="timestamp-cell">${entry.timestamp}</td>
+      ${answerCells}
+    </tr>`;
+  }).join('');
+}
+
+function clearLog() {
+  if (confirm("Are you sure you want to delete ALL quiz records? This cannot be undone.")) {
+    localStorage.removeItem(STORAGE_KEY);
+    renderAdminLog();
+  }
+}
+</script>
+</body>
+</html>
